@@ -1,0 +1,80 @@
+<?php
+/*
+ *
+ *  hook_menu()
+ */
+function acm_course_menu() {
+	$items = array();
+	$items['admin/course_entity'] = array(
+		'title' => 'Course Entity',
+		'page callback' => 'acm_course_formget',
+		'access arguments' => array('administer acm_course'), 
+		'access callback' => TRUE,
+		'type' => MENU_NORMAL_ITEM,
+	);
+	return $items;
+}
+function acm_course_init() {
+	drupal_add_css(drupal_get_path('module', 'acm_course') . '/css/acm_course.css');
+	drupal_add_js(drupal_get_path('module', 'acm_course') . '/js/acm_course.js'); 
+
+}
+function acm_course_formget(){
+	return drupal_get_form('acm_course_form');
+}
+/*
+ *
+ * hook form()
+ */
+function acm_course_form($form,&$form_state) {
+ 
+	$form['exam_score'] = array(
+		'#title' => t('Exam Score'),
+		'#type' => 'textfield',
+		'#required' => TRUE,  
+		'#prefix' => '<div class="require-data" >',
+		'#suffix' => '</div>' ,     
+	);
+	$form['test_score'] = array(
+		'#title' => t('Test Score'),
+		'#type' => 'textfield',
+		'#required' => TRUE,
+		'#prefix' => '<div class="require-data" >',
+		'#suffix' => '</div>' ,     
+	);
+	$form['submit'] = array(
+		'#value' => 'Submit',
+		'#type' => 'submit',
+		'#submit' => array('course_form_submit'),
+		'#prefix' => '<div class="member_submit" >',
+		'#suffix' => '</div>' ,
+	);
+	return $form;
+}
+function acm_course_form_submit($form, &$form_state){
+	$values=$form_state['values'];
+	drupal_write_record('courses', $values);
+	drupal_goto('admin/course/view');
+}
+//Get node type list
+function get_node_type($type, $limit=20, $offset = 0) {
+	$nodes = array();
+	$query = db_rewrite_sql("SELECT nid FROM {node} n WHERE type = '%s'", 'n');
+	$results = db_query_range($query, $type, $offset,$limit);
+	while($nid = db_result($results)) {
+		$nodes[] = node_load($nid);
+	}
+	return $nodes;
+}
+//Get user lists
+function get_userbyrole($name,$limit=20,$offset = 0) {
+	$query = db_rewrite_sql("SELECT u.uid, u.name FROM users u,role r, users_roles ur WHERE r.name='%s' AND r.rid=ur.rid AND ur.uid=u.uid",'u');
+	$results= db_query_range($query, $name,$offset,$limit);
+	while ($re = db_fetch_object($results)) {
+		$users[]=$re;
+	}
+  return $users;
+}
+
+
+
