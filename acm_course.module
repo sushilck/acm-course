@@ -168,7 +168,7 @@ function acm_course_form_validate($form, &$form_state){
 		form_set_error('uid',t('Please Select Student'));
 	}
 	if(empty($form_state['values']['course'])){
-		form_set_error('course',t('Please Select course'));
+		form_set_error('course',t('Please Select Course'));
 	}
 }
 function acm_course_form_submit($form, &$form_state){
